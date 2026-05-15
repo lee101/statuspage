@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customers | statuspage.app.nz</title>
+    <meta name="description" content="Search the statuspage.app.nz customer directory.">
+    <link rel="icon" href="/assets/logo.svg">
+    <link rel="stylesheet" href="/assets/site.css">
+  </head>
+  <body class="customers-page">
+    <header class="blog-header">
+      <a class="brand" href="/" aria-label="statuspage.app.nz home">
+        <img src="/assets/logo.svg" alt="" width="48" height="48">
+        <span><strong>statuspage<span>.app.nz</span></strong><small>by Applied AI NZ</small></span>
+      </a>
+      <nav aria-label="Customer directory navigation">
+        <a href="/">Home</a>
+        <a href="/blog">Blog</a>
+        <a href="/#signup">Get Started</a>
+      </nav>
+    </header>
+    <main class="directory-main">
+      <section class="directory-hero">
+        <p class="section-kicker">Customer directory</p>
+        <h1>Find businesses that publish their uptime.</h1>
+        <p>Every statuspage.app.nz customer can get a listing and backlink so users can verify reliability and discover their work.</p>
+        <form class="directory-search" id="customerSearch">
+          <input id="customerQuery" type="search" placeholder="Search businesses, apps, hosting, payments..." aria-label="Search customers">
+          <button type="submit">Search</button>
+        </form>
+      </section>
+      <section class="directory-results" id="customerResults" aria-live="polite"></section>
+    </main>
+    <footer class="site-footer">
+      <div class="footer-content">
+        <section class="footer-section footer-brand">
+          <a class="footer-logo" href="/"><img src="/assets/logo.svg" alt="" width="42" height="42"><span>statuspage<span>.app.nz</span></span></a>
+          <p>Status pages, uptime monitoring, email alerts, and a customer directory backlink for developers and small teams.</p>
+        </section>
+        <section class="footer-section">
+          <h3>Company</h3>
+          <ul>
+            <li><a href="https://app.nz">app.nz</a></li>
+            <li><a href="https://github.com/lee101/gobed">lee101/gobed</a></li>
+            <li><a href="mailto:lee.penkman@netwrck.com">lee.penkman@netwrck.com</a></li>
+          </ul>
+        </section>
+      </div>
+      <div class="footer-bottom"><span>&copy; 2026 statuspage.app.nz by Applied AI NZ.</span><span>Built for transparent teams.</span></div>
+    </footer>
+    <script>
+      const form = document.querySelector("#customerSearch");
+      const query = document.querySelector("#customerQuery");
+      const results = document.querySelector("#customerResults");
+      async function loadCustomers(q = "") {
+        const res = await fetch("/api/customers?q=" + encodeURIComponent(q));
+        const body = await res.json();
+        results.innerHTML = body.customers.map((item) => `
+          <article class="directory-card">
+            <strong>${item.name}</strong>
+            <a href="${item.url}" target="_blank" rel="noopener">${item.domain}</a>
+            <p>${item.description}</p>
+            <span>${item.uptime} uptime</span>
+          </article>
+        `).join("") || '<p>No customers found.</p>';
+      }
+      form.addEventListener("submit", (event) => { event.preventDefault(); loadCustomers(query.value); });
+      loadCustomers();
+    </script>
+  </body>
+</html>

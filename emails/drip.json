@@ -1,0 +1,22 @@
+[
+  {"day": 1, "template": "drip/01-welcome.html", "subject": "Welcome to statuspage.app.nz"},
+  {"day": 2, "template": "drip/02-choose-the-right-monitors.html", "subject": "Choose monitors customers understand"},
+  {"day": 3, "template": "drip/03-uptime-history.html", "subject": "Let uptime history build trust"},
+  {"day": 4, "template": "drip/04-alert-routing.html", "subject": "Send alerts where action happens"},
+  {"day": 5, "template": "drip/05-incident-language.html", "subject": "Write incident updates in plain language"},
+  {"day": 6, "template": "drip/06-response-time.html", "subject": "Watch response time, not just outages"},
+  {"day": 7, "template": "drip/07-circuit-breakers.html", "subject": "Use circuit breakers to fail gracefully"},
+  {"day": 8, "template": "drip/08-dependencies.html", "subject": "Track the services you rely on"},
+  {"day": 9, "template": "drip/09-custom-domain.html", "subject": "Put status on a familiar domain"},
+  {"day": 10, "template": "drip/10-subscriber-expectations.html", "subject": "Set expectations for subscribers"},
+  {"day": 11, "template": "drip/11-maintenance-windows.html", "subject": "Announce maintenance before it happens"},
+  {"day": 12, "template": "drip/12-severity.html", "subject": "Use clear severity levels"},
+  {"day": 13, "template": "drip/13-post-incident-review.html", "subject": "Write a short review after major incidents"},
+  {"day": 14, "template": "drip/14-monitor-from-outside.html", "subject": "Monitor from outside your own network"},
+  {"day": 15, "template": "drip/15-certificates-and-dns.html", "subject": "Do not forget certificates and DNS"},
+  {"day": 16, "template": "drip/16-on-call-handoff.html", "subject": "Make handoff easy"},
+  {"day": 17, "template": "drip/17-customer-directory.html", "subject": "Use your directory listing"},
+  {"day": 18, "template": "drip/18-test-the-process.html", "subject": "Test your incident process"},
+  {"day": 19, "template": "drip/19-review-monthly.html", "subject": "Review reliability monthly"},
+  {"day": 20, "template": "drip/20-trust-compounds.html", "subject": "Trust compounds"}
+]

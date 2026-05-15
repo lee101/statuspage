@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="statuspage.app.nz">
+  <circle cx="32" cy="32" r="27" fill="#0b1433" stroke="#34c759" stroke-width="6"/>
+  <path d="M19 33.5 28 42 46 20" fill="none" stroke="#34c759" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M44 9h9v9" fill="none" stroke="#5dd879" stroke-width="4" stroke-linecap="round"/>
+</svg>

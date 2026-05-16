@@ -21,7 +21,7 @@ First-time checkout:
 ```sh
 sscp
 cd /nvme0n1-disk/code
-git clone git@github.com:lee101/statuspage.git statuspage
+git clone https://github.com/lee101/statuspage.git statuspage
 cd statuspage
 ```
 

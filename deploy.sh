@@ -67,11 +67,27 @@ echo "Step 4: Syncing static output to Cloudflare R2"
   --cache-control "no-cache"
 
 if [[ -d "$BUILD_OUT_DIR/assets" ]]; then
-  "$AWS_BIN" s3 sync "$BUILD_OUT_DIR/assets" "s3://${R2_BUCKET}/${R2_PREFIX}/assets" \
+  "$AWS_BIN" s3 cp "$BUILD_OUT_DIR/assets" "s3://${R2_BUCKET}/${R2_PREFIX}/assets" \
     --endpoint-url "$R2_ENDPOINT" \
-    --delete \
+    --recursive \
     --cache-control "public, max-age=31536000, immutable"
 fi
+
+"$AWS_BIN" s3api put-object \
+  --endpoint-url "$R2_ENDPOINT" \
+  --bucket "$R2_BUCKET" \
+  --key "${R2_PREFIX}/" \
+  --body "$BUILD_OUT_DIR/index.html" \
+  --content-type "text/html; charset=utf-8" \
+  --cache-control "no-cache" >/dev/null
+
+"$AWS_BIN" s3api put-object \
+  --endpoint-url "$R2_ENDPOINT" \
+  --bucket "$R2_BUCKET" \
+  --key "$R2_PREFIX" \
+  --body "$BUILD_OUT_DIR/index.html" \
+  --content-type "text/html; charset=utf-8" \
+  --cache-control "no-cache" >/dev/null
 
 echo
 echo "Deploy complete: https://appstatic.app.nz/${R2_PREFIX}/"

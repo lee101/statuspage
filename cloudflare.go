@@ -65,7 +65,7 @@ func (c *cloudflareClient) lookupRecord(ctx context.Context, name string) (strin
 		return "", "", err
 	}
 	defer resp.Body.Close()
-	var out cloudflareResponse
+	var out cloudflareListResponse
 	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
 		return "", "", err
 	}
@@ -90,17 +90,17 @@ func (c *cloudflareClient) createRecord(ctx context.Context, payload map[string]
 		return "", err
 	}
 	defer resp.Body.Close()
-	var out cloudflareResponse
+	var out cloudflareRecordResponse
 	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
 		return "", err
 	}
 	if !out.Success {
 		return "", fmt.Errorf("cloudflare create failed: %v", out.Errors)
 	}
-	if len(out.Result) == 0 {
+	if out.Result.ID == "" {
 		return "", fmt.Errorf("cloudflare create returned no result")
 	}
-	return out.Result[0].ID, nil
+	return out.Result.ID, nil
 }
 
 func (c *cloudflareClient) updateRecord(ctx context.Context, recordID string, payload map[string]any) error {
@@ -115,7 +115,7 @@ func (c *cloudflareClient) updateRecord(ctx context.Context, recordID string, pa
 		return err
 	}
 	defer resp.Body.Close()
-	var out cloudflareResponse
+	var out cloudflareRecordResponse
 	if err := json.NewDecoder(resp.Body).Decode(&out); err != nil {
 		return err
 	}
@@ -135,10 +135,19 @@ func (c *cloudflareClient) decorate(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+c.apiToken)
 }
 
-type cloudflareResponse struct {
+type cloudflareListResponse struct {
 	Success bool              `json:"success"`
 	Errors  []cloudflareError `json:"errors"`
 	Result  []struct {
+		ID      string `json:"id"`
+		Content string `json:"content"`
+	} `json:"result"`
+}
+
+type cloudflareRecordResponse struct {
+	Success bool              `json:"success"`
+	Errors  []cloudflareError `json:"errors"`
+	Result  struct {
 		ID      string `json:"id"`
 		Content string `json:"content"`
 	} `json:"result"`

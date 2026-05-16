@@ -20,6 +20,7 @@
     <meta name="theme-color" content="#081133">
     <link rel="preload" href="/assets/site.css" as="style">
     <link rel="stylesheet" href="/assets/site.css">
+    <script src="https://js.stripe.com/v3/" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -57,6 +58,7 @@
         <a href="#customers">Customers</a>
         <a href="#docs">Docs</a>
         <a href="/blog">Blog</a>
+        <a href="/account">Account</a>
         <a href="#signup">Login</a>
       </nav>
       <a class="header-cta" href="#pricing">Get Started</a>
@@ -179,6 +181,14 @@
           <p id="form-message" role="status"></p>
         </form>
       </section>
+
+      <dialog id="checkout-dialog" class="checkout-dialog">
+        <form method="dialog" class="checkout-dialog-bar">
+          <strong>Stripe checkout</strong>
+          <button type="submit" id="checkout-close">Close</button>
+        </form>
+        <div id="checkout-container"></div>
+      </dialog>
 
       <section class="docs" id="docs">
         <h2>Developer-friendly setup</h2>

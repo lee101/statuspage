@@ -22,8 +22,9 @@ type StripeService struct {
 }
 
 type CheckoutSession struct {
-	ID  string `json:"id"`
-	URL string `json:"url"`
+	ID           string `json:"id"`
+	URL          string `json:"url"`
+	ClientSecret string `json:"client_secret"`
 }
 
 func NewStripeService(secretKey string) *StripeService {
@@ -51,6 +52,31 @@ func (s *StripeService) CreateSubscriptionCheckout(email, priceID, successURL, c
 	}
 	if session.URL == "" {
 		return nil, errors.New("stripe did not return a checkout url")
+	}
+	return &session, nil
+}
+
+func (s *StripeService) CreateEmbeddedSubscriptionCheckout(email, priceID, returnURL string, metadata map[string]string) (*CheckoutSession, error) {
+	vals := url.Values{
+		"mode":                                 {"subscription"},
+		"ui_mode":                              {"embedded"},
+		"customer_email":                       {email},
+		"return_url":                           {returnURL},
+		"line_items[0][price]":                 {priceID},
+		"line_items[0][quantity]":              {"1"},
+		"subscription_data[metadata][product]": {"statuspage.app.nz"},
+	}
+	for k, v := range metadata {
+		vals.Set(fmt.Sprintf("metadata[%s]", k), v)
+		vals.Set(fmt.Sprintf("subscription_data[metadata][%s]", k), v)
+	}
+
+	var session CheckoutSession
+	if err := s.post("/v1/checkout/sessions", vals, &session); err != nil {
+		return nil, err
+	}
+	if session.ClientSecret == "" {
+		return nil, errors.New("stripe did not return an embedded checkout client secret")
 	}
 	return &session, nil
 }

@@ -28,6 +28,7 @@ type App struct {
 	stripe         *StripeService
 	monthlyPriceID string
 	annualPriceID  string
+	publishableKey string
 	webhookSecret  string
 }
 
@@ -56,8 +57,9 @@ func main() {
 		stripe:        NewStripeService(os.Getenv("STRIPE_SECRET_KEY")),
 		monthlyPriceID: getenv("STRIPE_MONTHLY_PRICE_ID",
 			getenv("STRIPE_PRICE_ID", "price_1TX9jlHMzkYZId23ciQyuQXf")),
-		annualPriceID: getenv("STRIPE_ANNUAL_PRICE_ID", "price_1TXABZHMzkYZId23HlebQjzT"),
-		webhookSecret: os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		annualPriceID:  getenv("STRIPE_ANNUAL_PRICE_ID", "price_1TXABZHMzkYZId23HlebQjzT"),
+		publishableKey: os.Getenv("STRIPE_PUBLISHABLE_KEY"),
+		webhookSecret:  os.Getenv("STRIPE_WEBHOOK_SECRET"),
 	}
 
 	port := getenv("PORT", "8080")
@@ -77,9 +79,14 @@ func main() {
 
 func (a *App) handle(ctx *fasthttp.RequestCtx) {
 	p := string(ctx.Path())
+	if a.serveStatusPageHost(ctx, p) {
+		return
+	}
 	switch {
 	case p == "/":
 		a.serveIndex(ctx)
+	case p == "/account":
+		a.serveFile(ctx, "public/account.html")
 	case p == "/blog" || p == "/blog/uptime-builds-trust":
 		a.serveFile(ctx, "public/blog/uptime-builds-trust.html")
 	case p == "/customers":
@@ -106,6 +113,10 @@ func (a *App) handle(ctx *fasthttp.RequestCtx) {
 		a.handleCustomerDirectoryAPI(ctx)
 	case p == "/checkout/create":
 		a.handleCreateCheckout(ctx)
+	case p == "/checkout/create-embedded":
+		a.handleCreateEmbeddedCheckout(ctx)
+	case p == "/api/config":
+		writeJSON(ctx, fasthttp.StatusOK, map[string]any{"stripe_publishable_key": a.publishableKey})
 	case p == "/stripe/webhook":
 		a.handleStripeWebhook(ctx)
 	case strings.HasPrefix(p, "/assets/"):
@@ -246,14 +257,22 @@ func injectJasmineHarness(page string) string {
 }
 
 func (a *App) handleCreateCheckout(ctx *fasthttp.RequestCtx) {
+	a.handleCheckout(ctx, false)
+}
+
+func (a *App) handleCreateEmbeddedCheckout(ctx *fasthttp.RequestCtx) {
+	a.handleCheckout(ctx, true)
+}
+
+func (a *App) handleCheckout(ctx *fasthttp.RequestCtx, embedded bool) {
 	if !ctx.IsPost() {
 		writeJSON(ctx, fasthttp.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
 		return
 	}
-	if a.stripe.secretKey == "" || a.monthlyPriceID == "" || a.annualPriceID == "" {
+	if a.stripe.secretKey == "" || a.monthlyPriceID == "" || a.annualPriceID == "" || (embedded && a.publishableKey == "") {
 		writeJSON(ctx, fasthttp.StatusServiceUnavailable, map[string]any{
 			"error":   "stripe_not_configured",
-			"message": "Set STRIPE_SECRET_KEY, STRIPE_MONTHLY_PRICE_ID, and STRIPE_ANNUAL_PRICE_ID to enable checkout.",
+			"message": "Set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_MONTHLY_PRICE_ID, and STRIPE_ANNUAL_PRICE_ID to enable checkout.",
 		})
 		return
 	}
@@ -280,19 +299,27 @@ func (a *App) handleCreateCheckout(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	successURL := a.baseURL + "/?checkout=success&session_id={CHECKOUT_SESSION_ID}"
-	cancelURL := a.baseURL + "/?checkout=cancelled"
-	session, err := a.stripe.CreateSubscriptionCheckout(req.Email, priceID, successURL, cancelURL, map[string]string{
+	metadata := map[string]string{
 		"company": req.Company,
 		"domain":  req.Domain,
 		"plan":    planName,
-	})
+	}
+	var session *CheckoutSession
+	var err error
+	if embedded {
+		returnURL := a.baseURL + "/account?checkout=complete&session_id={CHECKOUT_SESSION_ID}"
+		session, err = a.stripe.CreateEmbeddedSubscriptionCheckout(req.Email, priceID, returnURL, metadata)
+	} else {
+		successURL := a.baseURL + "/?checkout=success&session_id={CHECKOUT_SESSION_ID}"
+		cancelURL := a.baseURL + "/?checkout=cancelled"
+		session, err = a.stripe.CreateSubscriptionCheckout(req.Email, priceID, successURL, cancelURL, metadata)
+	}
 	if err != nil {
 		log.Printf("stripe checkout: %v", err)
 		writeJSON(ctx, fasthttp.StatusBadGateway, map[string]any{"error": "stripe_error"})
 		return
 	}
-	writeJSON(ctx, fasthttp.StatusOK, map[string]any{"url": session.URL, "id": session.ID})
+	writeJSON(ctx, fasthttp.StatusOK, map[string]any{"url": session.URL, "id": session.ID, "client_secret": session.ClientSecret})
 }
 
 func (a *App) checkoutPlan(plan string) (priceID, planName string, ok bool) {

@@ -216,6 +216,27 @@ func (a *App) handlePublicStatusPage(ctx *fasthttp.RequestCtx, slug string) {
 	ctx.SetBodyString(renderStatusPage(page))
 }
 
+func (a *App) serveStatusPageHost(ctx *fasthttp.RequestCtx, requestPath string) bool {
+	host := strings.ToLower(string(ctx.Host()))
+	host = strings.Split(host, ":")[0]
+	if host == "" || host == "statuspage.app.nz" || !strings.HasSuffix(host, ".statuspage.app.nz") {
+		return false
+	}
+	if requestPath != "/" {
+		return false
+	}
+	page, ok := a.lookupPublicPageByHost(host)
+	if !ok {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		ctx.SetContentType("text/html; charset=utf-8")
+		ctx.SetBodyString("<h1>Status page not found</h1>")
+		return true
+	}
+	ctx.SetContentType("text/html; charset=utf-8")
+	ctx.SetBodyString(renderStatusPage(page))
+	return true
+}
+
 func (a *App) lookupPublicPage(slug string) (map[string]string, bool) {
 	if a.db == nil {
 		if slug == "demo" {
@@ -225,6 +246,23 @@ func (a *App) lookupPublicPage(slug string) (map[string]string, bool) {
 	}
 	var name, desc, website string
 	err := a.db.QueryRow(`SELECT name, description, website_url FROM status_pages WHERE slug = $1 AND published = true`, slug).Scan(&name, &desc, &website)
+	if err != nil {
+		return nil, false
+	}
+	return map[string]string{"name": name, "slug": slug, "description": desc, "website_url": website}, true
+}
+
+func (a *App) lookupPublicPageByHost(hostname string) (map[string]string, bool) {
+	if a.db == nil {
+		return nil, false
+	}
+	var name, slug, desc, website string
+	err := a.db.QueryRow(`
+		SELECT sp.name, sp.slug, sp.description, sp.website_url
+		FROM status_page_domains d
+		JOIN status_pages sp ON sp.id = d.status_page_id
+		WHERE d.hostname = $1 AND d.status = 'active' AND sp.published = true
+	`, hostname).Scan(&name, &slug, &desc, &website)
 	if err != nil {
 		return nil, false
 	}

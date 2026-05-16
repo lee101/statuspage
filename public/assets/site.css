@@ -497,6 +497,91 @@ form {
   grid-column: 1 / -1;
 }
 
+.account-page {
+  background: #f6f8fc;
+}
+
+.account-main {
+  padding: 132px clamp(18px, 5vw, 72px) 56px;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.account-box {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.account-box h1,
+.account-box h2 {
+  margin-bottom: 0;
+}
+
+.account-box h1 {
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.account-box form {
+  grid-template-columns: 1fr;
+}
+
+.account-state,
+.account-list {
+  display: grid;
+  gap: 8px;
+}
+
+.account-state span,
+.account-list span {
+  color: var(--muted);
+}
+
+.account-list p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.checkout-dialog {
+  width: min(980px, calc(100vw - 28px));
+  min-height: min(760px, calc(100vh - 28px));
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.checkout-dialog::backdrop {
+  background: rgba(8, 17, 51, .68);
+}
+
+.checkout-dialog-bar {
+  display: flex;
+  grid-template-columns: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+#checkout-container {
+  min-height: 620px;
+  padding: 12px;
+}
+
 .billing-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1133,6 +1218,7 @@ pre {
   .features,
   .docs-grid,
   .ops-grid,
+  .account-grid,
   form,
   .billing-options {
     grid-template-columns: 1fr;

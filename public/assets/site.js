@@ -75,6 +75,7 @@ authForm?.addEventListener("submit", async (event) => {
     const body = await res.json();
     if (!res.ok) throw new Error(body.error || "Account request failed");
     setUser(body.user);
+    localStorage.setItem("statuspageHasSession", "true");
     authMessage.textContent = authMode === "login" ? "Logged in." : "Account created.";
     form.email.value = body.user.email;
     form.company.value = body.user.company;
@@ -85,6 +86,7 @@ authForm?.addEventListener("submit", async (event) => {
 
 logoutButton?.addEventListener("click", async () => {
   await fetch("/api/logout", { method: "POST" });
+  localStorage.removeItem("statuspageHasSession");
   setUser(null);
 });
 
@@ -96,12 +98,17 @@ newsletterForm?.addEventListener("submit", (event) => {
 });
 
 async function loadCurrentUser() {
+  if (localStorage.getItem("statuspageHasSession") !== "true") return;
   try {
     const res = await fetch("/api/me");
-    if (!res.ok) return;
+    if (!res.ok) {
+      localStorage.removeItem("statuspageHasSession");
+      return;
+    }
     const body = await res.json();
     setUser(body.user);
   } catch {
+    localStorage.removeItem("statuspageHasSession");
     setUser(null);
   }
 }

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "bun run build:static && gofmt -w *.go && go build -o statuspage .",
+    "build:static": "bun scripts/build-static.mjs",
+    "dev": "bun run build:static && PORT=8094 APP_URL=http://localhost:8094 go run .",
+    "lighthouse": "lighthouse http://localhost:8094/ --quiet --chrome-flags=\"--headless --no-sandbox\" --output=json --output-path=./test-results/lighthouse.json"
+  },
+  "devDependencies": {}
+}

@@ -33,11 +33,12 @@ make test
 
 ## Stripe
 
-Create a recurring Stripe Price for `$19/month`, then set:
+Create recurring Stripe Prices for `$19/month` and `$190/year`, then set:
 
 - `STRIPE_SECRET_KEY`
-- `STRIPE_PRICE_ID`
+- `STRIPE_MONTHLY_PRICE_ID`
+- `STRIPE_ANNUAL_PRICE_ID`
 - `STRIPE_WEBHOOK_SECRET`
 - `APP_URL`
 
-The checkout endpoint is `POST /checkout/create`. Stripe webhooks should point at `POST /stripe/webhook`.
+The checkout endpoint is `POST /checkout/create` with `plan` set to `annual` or `monthly`. Annual checkout is the default. Stripe webhooks should point at `POST /stripe/webhook`.

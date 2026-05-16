@@ -4,7 +4,7 @@
   --muted: #4d5875;
   --line: #d9e0ee;
   --green: #34c759;
-  --green-dark: #1e9f43;
+  --green-dark: #117a2d;
   --blue: #2f8fff;
   --violet: #8f58d7;
   --amber: #c97919;
@@ -49,6 +49,11 @@ a {
   gap: 32px;
   padding: 24px clamp(20px, 5vw, 80px);
   color: #fff;
+}
+
+.brand img,
+.footer-logo img {
+  flex: 0 0 auto;
 }
 
 .brand {
@@ -486,6 +491,61 @@ form {
 
 #signup-form {
   grid-column: 1 / -1;
+}
+
+#signup-form .billing-options {
+  grid-column: 1 / -1;
+}
+
+.billing-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.billing-options legend {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.billing-option {
+  position: relative;
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid #c8d3e3;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.billing-option input {
+  width: 18px;
+  min-height: 18px;
+  margin: 0;
+  accent-color: var(--green-dark);
+}
+
+.billing-option span {
+  display: grid;
+  gap: 2px;
+}
+
+.billing-option strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.billing-option small {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .tabs {
@@ -1073,7 +1133,8 @@ pre {
   .features,
   .docs-grid,
   .ops-grid,
-  form {
+  form,
+  .billing-options {
     grid-template-columns: 1fr;
   }
 
@@ -1121,6 +1182,6 @@ pre {
   .hero-copy,
   .dashboard {
     width: 100%;
-    max-width: 340px;
+    max-width: 100%;
   }
 }

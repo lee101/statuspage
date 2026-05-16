@@ -2,7 +2,9 @@ describe("statuspage.app.nz landing page", function () {
   it("renders the core brand and pricing", function () {
     expect(document.title).toContain("statuspage.app.nz");
     expect(document.querySelector(".brand strong").textContent).toContain("statuspage.app.nz");
-    expect(document.body.textContent).toContain("$19/mo");
+    expect(document.body.textContent).toContain("$190/year");
+    expect(document.querySelector("input[name='plan'][value='annual']").checked).toBeTrue();
+    expect(document.querySelector("input[name='plan'][value='monthly']")).not.toBeNull();
   });
 
   it("renders the example status dashboard", function () {

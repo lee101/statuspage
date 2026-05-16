@@ -14,10 +14,11 @@ deps: ## Download Go dependencies
 fmt: ## Format Go code
 	gofmt -w *.go
 
-build: fmt ## Build the server binary
-	go build -o $(BINARY) .
+build: ## Build optimized static assets and the server binary
+	bun run build
 
 run: ## Run the development server
+	bun run build:static
 	PORT=$(PORT) APP_URL=$(APP_URL) go run .
 
 test-go: ## Run Go tests

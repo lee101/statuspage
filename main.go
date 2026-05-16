@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"compress/gzip"
 	"database/sql"
 	"embed"
 	"encoding/json"
@@ -15,23 +17,25 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-//go:embed public/*
+//go:embed dist/public/*
 var publicFS embed.FS
 
 type App struct {
-	baseURL       string
-	db            *sql.DB
-	sessionSecret []byte
-	dns           dnsProvisioner
-	stripe        *StripeService
-	stripePriceID string
-	webhookSecret string
+	baseURL        string
+	db             *sql.DB
+	sessionSecret  []byte
+	dns            dnsProvisioner
+	stripe         *StripeService
+	monthlyPriceID string
+	annualPriceID  string
+	webhookSecret  string
 }
 
 type signupRequest struct {
 	Email   string `json:"email"`
 	Company string `json:"company"`
 	Domain  string `json:"domain"`
+	Plan    string `json:"plan"`
 }
 
 func main() {
@@ -50,7 +54,9 @@ func main() {
 		sessionSecret: []byte(getenv("SESSION_SECRET", "dev-session-secret-change-me")),
 		dns:           newDNSProvisionerFromEnv(),
 		stripe:        NewStripeService(os.Getenv("STRIPE_SECRET_KEY")),
-		stripePriceID: os.Getenv("STRIPE_PRICE_ID"),
+		monthlyPriceID: getenv("STRIPE_MONTHLY_PRICE_ID",
+			getenv("STRIPE_PRICE_ID", "price_1TX9jlHMzkYZId23ciQyuQXf")),
+		annualPriceID: getenv("STRIPE_ANNUAL_PRICE_ID", "price_1TXABZHMzkYZId23HlebQjzT"),
 		webhookSecret: os.Getenv("STRIPE_WEBHOOK_SECRET"),
 	}
 
@@ -114,7 +120,7 @@ func (a *App) handle(ctx *fasthttp.RequestCtx) {
 }
 
 func (a *App) serveIndex(ctx *fasthttp.RequestCtx) {
-	data, err := publicFS.ReadFile("public/index.html")
+	data, err := publicFS.ReadFile("dist/public/index.html")
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		ctx.SetBodyString("not found")
@@ -125,10 +131,13 @@ func (a *App) serveIndex(ctx *fasthttp.RequestCtx) {
 		body = injectJasmineHarness(body)
 	}
 	ctx.SetContentType("text/html; charset=utf-8")
-	ctx.SetBodyString(body)
+	ctx.Response.Header.Set("Cache-Control", "no-cache")
+	ctx.Response.Header.Set("X-Content-Type-Options", "nosniff")
+	setBody(ctx, []byte(body), "text/html")
 }
 
 func (a *App) serveFile(ctx *fasthttp.RequestCtx, name string) {
+	name = "dist/" + strings.TrimPrefix(name, "dist/")
 	data, err := publicFS.ReadFile(name)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
@@ -142,8 +151,41 @@ func (a *App) serveFile(ctx *fasthttp.RequestCtx, name string) {
 	ctx.SetContentType(ct)
 	if strings.HasSuffix(name, ".html") {
 		ctx.SetContentType("text/html; charset=utf-8")
+		ctx.Response.Header.Set("Cache-Control", "no-cache")
+	} else if strings.HasPrefix(name, "dist/public/assets/") {
+		ctx.Response.Header.Set("Cache-Control", "public, max-age=31536000")
+	} else {
+		ctx.Response.Header.Set("Cache-Control", "public, max-age=300")
+	}
+	ctx.Response.Header.Set("X-Content-Type-Options", "nosniff")
+	setBody(ctx, data, ct)
+}
+
+func setBody(ctx *fasthttp.RequestCtx, data []byte, contentType string) {
+	if shouldGzip(ctx, contentType, len(data)) {
+		var buf bytes.Buffer
+		zw := gzip.NewWriter(&buf)
+		_, _ = zw.Write(data)
+		_ = zw.Close()
+		ctx.Response.Header.Set("Content-Encoding", "gzip")
+		ctx.Response.Header.Set("Vary", "Accept-Encoding")
+		ctx.SetBody(buf.Bytes())
+		return
 	}
 	ctx.SetBody(data)
+}
+
+func shouldGzip(ctx *fasthttp.RequestCtx, contentType string, size int) bool {
+	if size < 1024 {
+		return false
+	}
+	if !strings.Contains(string(ctx.Request.Header.Peek("Accept-Encoding")), "gzip") {
+		return false
+	}
+	return strings.HasPrefix(contentType, "text/") ||
+		strings.Contains(contentType, "javascript") ||
+		strings.Contains(contentType, "json") ||
+		strings.Contains(contentType, "svg")
 }
 
 func injectJasmineHarness(page string) string {
@@ -208,10 +250,10 @@ func (a *App) handleCreateCheckout(ctx *fasthttp.RequestCtx) {
 		writeJSON(ctx, fasthttp.StatusMethodNotAllowed, map[string]any{"error": "method_not_allowed"})
 		return
 	}
-	if a.stripe.secretKey == "" || a.stripePriceID == "" {
+	if a.stripe.secretKey == "" || a.monthlyPriceID == "" || a.annualPriceID == "" {
 		writeJSON(ctx, fasthttp.StatusServiceUnavailable, map[string]any{
 			"error":   "stripe_not_configured",
-			"message": "Set STRIPE_SECRET_KEY and STRIPE_PRICE_ID to enable checkout.",
+			"message": "Set STRIPE_SECRET_KEY, STRIPE_MONTHLY_PRICE_ID, and STRIPE_ANNUAL_PRICE_ID to enable checkout.",
 		})
 		return
 	}
@@ -224,17 +266,26 @@ func (a *App) handleCreateCheckout(ctx *fasthttp.RequestCtx) {
 	req.Email = strings.TrimSpace(req.Email)
 	req.Company = strings.TrimSpace(req.Company)
 	req.Domain = strings.TrimSpace(req.Domain)
+	req.Plan = strings.TrimSpace(strings.ToLower(req.Plan))
+	if req.Plan == "" {
+		req.Plan = "annual"
+	}
 	if !strings.Contains(req.Email, "@") || req.Company == "" {
 		writeJSON(ctx, fasthttp.StatusBadRequest, map[string]any{"error": "email_and_company_required"})
+		return
+	}
+	priceID, planName, ok := a.checkoutPlan(req.Plan)
+	if !ok {
+		writeJSON(ctx, fasthttp.StatusBadRequest, map[string]any{"error": "invalid_plan"})
 		return
 	}
 
 	successURL := a.baseURL + "/?checkout=success&session_id={CHECKOUT_SESSION_ID}"
 	cancelURL := a.baseURL + "/?checkout=cancelled"
-	session, err := a.stripe.CreateSubscriptionCheckout(req.Email, a.stripePriceID, successURL, cancelURL, map[string]string{
+	session, err := a.stripe.CreateSubscriptionCheckout(req.Email, priceID, successURL, cancelURL, map[string]string{
 		"company": req.Company,
 		"domain":  req.Domain,
-		"plan":    "statuspage_monthly_19",
+		"plan":    planName,
 	})
 	if err != nil {
 		log.Printf("stripe checkout: %v", err)
@@ -242,6 +293,17 @@ func (a *App) handleCreateCheckout(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	writeJSON(ctx, fasthttp.StatusOK, map[string]any{"url": session.URL, "id": session.ID})
+}
+
+func (a *App) checkoutPlan(plan string) (priceID, planName string, ok bool) {
+	switch plan {
+	case "monthly":
+		return a.monthlyPriceID, "statuspage_monthly_19", true
+	case "annual":
+		return a.annualPriceID, "statuspage_annual_190", true
+	default:
+		return "", "", false
+	}
 }
 
 func (a *App) handleStripeWebhook(ctx *fasthttp.RequestCtx) {

@@ -3,17 +3,48 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>statuspage.app.nz by Applied AI NZ</title>
-    <meta name="description" content="Create a hosted status page, monitor your services, get email alerts, and earn a backlink in the statuspage.app.nz customer directory.">
-    <meta property="og:title" content="statuspage.app.nz">
-    <meta property="og:description" content="Simple hosted status pages for developers and New Zealand businesses.">
+    <title>Status Pages, Uptime Monitoring & Email Alerts | statuspage.app.nz</title>
+    <meta name="description" content="Create a hosted status page for your business with HTTP, ping, DNS, and port monitoring, email incident alerts, custom domains, SSL, and a customer directory backlink.">
+    <link rel="canonical" href="https://statuspage.app.nz/">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="Status pages and uptime monitoring for New Zealand businesses">
+    <meta property="og:description" content="Hosted status pages with uptime monitoring, email alerts, custom domains, SSL, and a customer directory backlink.">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://statuspage.app.nz/">
+    <meta property="og:site_name" content="statuspage.app.nz">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="statuspage.app.nz">
+    <meta name="twitter:description" content="Hosted status pages with monitoring, alerts, custom domains, and SSL.">
     <link rel="icon" href="/assets/logo.svg">
+    <link rel="mask-icon" href="/assets/logo.svg" color="#34c759">
+    <meta name="theme-color" content="#081133">
+    <link rel="preload" href="/assets/site.css" as="style">
     <link rel="stylesheet" href="/assets/site.css">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "statuspage.app.nz",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "description": "Hosted status pages with uptime monitoring, email alerts, custom domains, SSL, and a customer directory backlink.",
+        "url": "https://statuspage.app.nz/",
+        "offers": {
+          "@type": "Offer",
+          "price": "190",
+          "priceCurrency": "NZD",
+          "availability": "https://schema.org/InStock"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Applied AI NZ"
+        }
+      }
+    </script>
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/" aria-label="statuspage.app.nz home">
+      <a class="brand" href="/">
         <img src="/assets/logo.svg" alt="" width="48" height="48">
         <span>
           <strong>statuspage<span>.app.nz</span></strong>
@@ -35,7 +66,7 @@
       <section class="hero">
         <div class="hero-copy">
           <p class="eyebrow">Hosted status pages for developers</p>
-          <h1>Status pages made simple.</h1>
+          <h1>Status pages and uptime monitoring made simple.</h1>
           <p class="lead">Create a clean public status page, monitor HTTP, ping, DNS, and ports, get email alerts when something breaks, and build trust with customers.</p>
           <ul class="checks">
             <li>Create your status page in minutes</li>
@@ -45,13 +76,13 @@
           </ul>
           <div class="price-box" id="pricing">
             <div>
-              <span>All this for</span>
-              <strong>$19<small>/mo</small></strong>
+              <span>Annual plan</span>
+              <strong>$190<small>/yr</small></strong>
             </div>
             <ul>
+              <li>Best value, default checkout</li>
+              <li>Monthly available at $19/mo</li>
               <li>No setup fees</li>
-              <li>Cancel anytime</li>
-              <li>NZ based support</li>
             </ul>
             <a class="button" href="#signup">Get Started</a>
           </div>
@@ -112,7 +143,7 @@
           <p>Create an account, then continue to Stripe when you are ready. We will help you configure monitors, branding, alerts, and your customer directory listing.</p>
         </div>
         <div class="account-panel" id="account-panel">
-          <div class="tabs" role="tablist" aria-label="Account">
+          <div class="tabs" aria-label="Account">
             <button type="button" class="tab active" data-mode="register">Create account</button>
             <button type="button" class="tab" data-mode="login">Login</button>
           </div>
@@ -130,6 +161,17 @@
           </div>
         </div>
         <form id="signup-form">
+          <fieldset class="billing-options">
+            <legend>Billing</legend>
+            <label class="billing-option">
+              <input type="radio" name="plan" value="annual" checked>
+              <span><strong>Annual</strong><small>$190/year</small></span>
+            </label>
+            <label class="billing-option">
+              <input type="radio" name="plan" value="monthly">
+              <span><strong>Monthly</strong><small>$19/month</small></span>
+            </label>
+          </fieldset>
           <label>Email<input name="email" type="email" placeholder="you@company.co.nz" required></label>
           <label>Business name<input name="company" placeholder="My Company" required></label>
           <label>Domain<input name="domain" placeholder="company.co.nz"></label>

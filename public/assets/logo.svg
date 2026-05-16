@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="statuspage.app.nz">
-  <circle cx="32" cy="32" r="27" fill="#0b1433" stroke="#34c759" stroke-width="6"/>
-  <path d="M19 33.5 28 42 46 20" fill="none" stroke="#34c759" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M44 9h9v9" fill="none" stroke="#5dd879" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="statuspage.app.nz status check logo">
+  <rect width="64" height="64" rx="14" fill="#081133"/>
+  <path d="M14 41 24 31l8 7 18-20" fill="none" stroke="#34c759" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M15 49h34" stroke="#e7eefb" stroke-width="5" stroke-linecap="round" opacity=".92"/>
+  <path d="M49 18h4v-4" fill="none" stroke="#8be58f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

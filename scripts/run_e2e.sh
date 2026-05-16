@@ -18,10 +18,14 @@ PORT="${PORT}" \
 APP_URL="${APP_URL}" \
 "${RESULT_DIR}/statuspage-e2e" >"${RESULT_DIR}/server.log" 2>&1 &
 server_pid=$!
-trap 'kill ${server_pid} >/dev/null 2>&1 || true' EXIT
+cleanup() {
+  kill "${server_pid}" >/dev/null 2>&1 || true
+  wait "${server_pid}" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
 
 for _ in $(seq 1 40); do
-  if curl -fsS "${APP_URL}/health" >/dev/null 2>&1; then
+  if curl --max-time 2 -fsS "${APP_URL}/health" >/dev/null 2>&1; then
     break
   fi
   sleep 0.25
@@ -47,4 +51,6 @@ if ! grep -q 'data-status="passed"' "${RESULT_DIR}/jasmine-dom.html"; then
   exit 1
 fi
 
+cleanup
+trap - EXIT
 echo "Jasmine e2e passed"

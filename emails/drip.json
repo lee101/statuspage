@@ -18,5 +18,13 @@
   {"day": 17, "template": "drip/17-customer-directory.html", "subject": "Use your directory listing"},
   {"day": 18, "template": "drip/18-test-the-process.html", "subject": "Test your incident process"},
   {"day": 19, "template": "drip/19-review-monthly.html", "subject": "Review reliability monthly"},
-  {"day": 20, "template": "drip/20-trust-compounds.html", "subject": "Trust compounds"}
+  {"day": 20, "template": "drip/20-trust-compounds.html", "subject": "Trust compounds"},
+  {"day": 21, "template": "drip/21-applied-ai-nz.html", "subject": "What Applied AI NZ builds"},
+  {"day": 23, "template": "drip/22-ai-apis-and-routing.html", "subject": "AI APIs without making your stack messy"},
+  {"day": 25, "template": "drip/23-creation-tools.html", "subject": "Turn content ideas into working assets"},
+  {"day": 27, "template": "drip/24-browser-tools.html", "subject": "Fast prototypes, fiddles, and simulated sites"},
+  {"day": 29, "template": "drip/25-games-and-learning.html", "subject": "Games as retention and learning loops"},
+  {"day": 31, "template": "drip/26-growth-and-partners.html", "subject": "Growth tools around a reliable product"},
+  {"day": 33, "template": "drip/27-voice-and-workflows.html", "subject": "Voice, automation, and day-to-day workflows"},
+  {"day": 35, "template": "drip/28-technical-products-map.html", "subject": "A technical product map from Applied AI NZ"}
 ]

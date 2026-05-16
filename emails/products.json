@@ -1,0 +1,140 @@
+[
+  {
+    "name": "Applied AI NZ",
+    "url": "https://app.nz",
+    "category": "company",
+    "summary": "Kiwi-owned applied AI and engineering company building practical software, AI tools, games, and infrastructure products."
+  },
+  {
+    "name": "Text Generator",
+    "url": "https://text-generator.io",
+    "category": "ai-api",
+    "summary": "Unified text, vision, and speech API with practical tools such as prompt optimization, image captioning, and AI text editing."
+  },
+  {
+    "name": "Open Paths",
+    "url": "https://openpaths.io",
+    "category": "ai-infrastructure",
+    "summary": "Open source model-routing proposition for latency, throughput, cost, and provider fallback control."
+  },
+  {
+    "name": "Netwrck",
+    "url": "https://netwrck.com",
+    "category": "creation",
+    "summary": "AI character chat and multimodal creation hub with voice, sharing, saved chats, tools, AI art, chatbot, gallery, and API surfaces."
+  },
+  {
+    "name": "AI Art Generator",
+    "url": "https://ebank.nz",
+    "category": "creation",
+    "summary": "AI image workflow with presets, editor handoff, downloads, upscaling, style transfer, and video creation options."
+  },
+  {
+    "name": "AI Art Generator Brand",
+    "url": "https://aiart-generator.art",
+    "category": "creation",
+    "summary": "Brand entry-point into the AI Art Generator experience and style categories."
+  },
+  {
+    "name": "SimplexGen",
+    "url": "https://simplexgen.com",
+    "category": "3d",
+    "summary": "Image-to-3D and mesh tooling for simplify, smooth, subdivide, repair, retopology, boolean operations, UV, texture, and sculpting workflows."
+  },
+  {
+    "name": "Web Fiddle",
+    "url": "https://webfiddle.net",
+    "category": "developer-tool",
+    "summary": "Minimal in-browser JS/CSS/editor pattern with save, run, and share controls."
+  },
+  {
+    "name": "Site Sim",
+    "url": "https://sitesim.net",
+    "category": "developer-tool",
+    "summary": "AI website simulation and editing UI with preview, JS, CSS, HTML, details, files, agent, run, and share modes."
+  },
+  {
+    "name": "Experiment Flow",
+    "url": "https://experimentflow.com",
+    "category": "growth",
+    "summary": "A/B testing and AI personalization with neural bandit positioning, lightweight SDK goals, and privacy-first posture."
+  },
+  {
+    "name": "Evangeler",
+    "url": "https://evangeler.com",
+    "category": "growth",
+    "summary": "Affiliate program platform for launching, listing, scaling, analytics, and partner payouts."
+  },
+  {
+    "name": "Bitbank",
+    "url": "https://bitbank.nz",
+    "category": "forecasting-api",
+    "summary": "Crypto forecasting product with real-time predictions, accuracy tracking, subscriber horizons, and API access."
+  },
+  {
+    "name": "Dictator Flow",
+    "url": "https://dictatorflow.com",
+    "category": "voice-productivity",
+    "summary": "Voice dictation and command editing for rewriting, code fixes, translation, and summarization workflows."
+  },
+  {
+    "name": "Codex Infinity",
+    "url": "https://codex-infinity.com",
+    "category": "coding-agent",
+    "summary": "Autonomous coding agent positioning for continuous coding workflows and idea generation."
+  },
+  {
+    "name": "Ring NZ",
+    "url": "https://ring.nz",
+    "category": "voice-ai",
+    "summary": "AI-powered voice call product with account-based access."
+  },
+  {
+    "name": "V5 Games",
+    "url": "https://v5games.com",
+    "category": "games",
+    "summary": "Directory for AI text adventures and browser games, including Word Smashing, Multiplication Master, reWord Game, and Big Multiplayer Chess."
+  },
+  {
+    "name": "Addicting Word Games",
+    "url": "https://addictingwordgames.com",
+    "category": "games",
+    "summary": "Word and typing game hub with puzzle, typing, vocabulary, maths, and chess-like browser games."
+  },
+  {
+    "name": "Big Multiplayer Chess",
+    "url": "https://bigmultiplayerchess.com",
+    "category": "games",
+    "summary": "Large-player chess variant where pawns move and take in four directions and king capture transfers pieces."
+  },
+  {
+    "name": "Word Smashing",
+    "url": "https://wordsmashing.com",
+    "category": "games",
+    "summary": "Word-board puzzle where players make words in multiple directions before the board fills up."
+  },
+  {
+    "name": "reWord Game",
+    "url": "https://rewordgame.com",
+    "category": "games",
+    "summary": "Sentence repair game about swapping words into the right order."
+  },
+  {
+    "name": "Multiplication Master",
+    "url": "https://multiplicationmaster.com",
+    "category": "games",
+    "summary": "Timed maths practice game loop for multiplication fluency."
+  },
+  {
+    "name": "Hires NZ",
+    "url": "https://hires.nz",
+    "category": "marketplace",
+    "summary": "New Zealand marketplace for rentals, services, equipment, jobs, listing flows, and pricing tiers."
+  },
+  {
+    "name": "How NZ",
+    "url": "https://how.nz",
+    "category": "technical-writing",
+    "summary": "Lee Penkman's technical blog with AI development, audio processing, monitoring, and service posts."
+  }
+]

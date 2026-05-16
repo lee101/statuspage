@@ -11,6 +11,7 @@ R2_BUCKET="${R2_BUCKET:-appstatic}"
 R2_PREFIX="${R2_PREFIX:-statuspage}"
 PUBLIC_BASE_PATH="${PUBLIC_BASE_PATH:-/$R2_PREFIX}"
 BUILD_OUT_DIR="${BUILD_OUT_DIR:-dist/appstatic}"
+DEPLOY_BINARY="${DEPLOY_BINARY:-.deploy/statuspage}"
 STATUSPAGE_BINARY_WAS_DIRTY=0
 
 if [[ -d ".git" ]] && ! git diff --quiet -- statuspage 2>/dev/null; then
@@ -44,6 +45,9 @@ echo "AWS: $AWS_BIN"
 echo
 echo "Step 1: Building production app"
 "$BUN_BIN" run build
+mkdir -p "$(dirname "$DEPLOY_BINARY")"
+cp statuspage "$DEPLOY_BINARY"
+chmod +x "$DEPLOY_BINARY"
 
 echo
 echo "Step 2: Running Go tests"

@@ -7,7 +7,7 @@ The live app is served by systemd on the prod machine and proxied by nginx:
 ```text
 Cloudflare DNS A statuspage.app.nz -> 93.127.141.100
 nginx :80 server_name statuspage.app.nz *.statuspage.app.nz -> 127.0.0.1:8096
-systemd statuspage.service -> /nvme0n1-disk/code/statuspage/statuspage
+systemd statuspage.service -> /nvme0n1-disk/code/statuspage/.deploy/statuspage
 ```
 
 The static bucket build is also published to Cloudflare R2 under `appstatic/statuspage` for CDN/static checks.
@@ -55,7 +55,7 @@ The systemd unit should load that file directly:
 ```ini
 [Service]
 WorkingDirectory=/nvme0n1-disk/code/statuspage
-ExecStart=/nvme0n1-disk/code/statuspage/statuspage
+ExecStart=/nvme0n1-disk/code/statuspage/.deploy/statuspage
 EnvironmentFile=/nvme0n1-disk/code/statuspage/.env
 ```
 
@@ -91,8 +91,9 @@ The app.nz shared login uses the `appnz_session` cookie on `.app.nz` and validat
 
 1. Runs `bun run build` to rebuild the Go-embedded production output and server binary.
 2. Runs `go test ./...`.
-3. Builds a bucket-specific static copy with `PUBLIC_BASE_PATH=/statuspage` into `dist/appstatic`.
-4. Syncs `dist/appstatic` to `s3://appstatic/statuspage` using the Cloudflare R2 endpoint.
+3. Copies the fresh server binary to `.deploy/statuspage` for systemd, then restores the tracked development binary if needed.
+4. Builds a bucket-specific static copy with `PUBLIC_BASE_PATH=/statuspage` into `dist/appstatic`.
+5. Syncs `dist/appstatic` to `s3://appstatic/statuspage` using the Cloudflare R2 endpoint.
 
 After deploying on the prod machine, restart the service:
 

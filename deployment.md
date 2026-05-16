@@ -1,6 +1,16 @@
 # Deployment
 
-Production deploys run on the server as `administrator` and publish the static build to Cloudflare R2 under `appstatic/statuspage`.
+Production deploys run on the server as `administrator`.
+
+The live app is served by systemd on the prod machine and proxied by nginx:
+
+```text
+Cloudflare DNS A statuspage.app.nz -> 93.127.141.100
+nginx :80 server_name statuspage.app.nz -> 127.0.0.1:8096
+systemd statuspage.service -> /nvme0n1-disk/code/statuspage/statuspage
+```
+
+The static bucket build is also published to Cloudflare R2 under `appstatic/statuspage` for CDN/static checks.
 
 ## Server
 
@@ -41,6 +51,20 @@ git pull --ff-only
 3. Builds a bucket-specific static copy with `PUBLIC_BASE_PATH=/statuspage` into `dist/appstatic`.
 4. Syncs `dist/appstatic` to `s3://appstatic/statuspage` using the Cloudflare R2 endpoint.
 
+After deploying on the prod machine, restart the service:
+
+```sh
+echo ilu | sudo -S systemctl restart statuspage.service
+```
+
+Verify nginx and systemd:
+
+```sh
+systemctl status statuspage.service
+curl -fsS http://127.0.0.1:8096/health
+curl -I -H 'Host: statuspage.app.nz' http://127.0.0.1/
+```
+
 The public static URL is:
 
 ```text
@@ -54,3 +78,11 @@ R2_BUCKET=appstatic R2_PREFIX=statuspage ./deploy.sh
 ```
 
 The script can use existing `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, or `CLOUDFLARE_R2_ACCESS_KEY_ID` and `CLOUDFLARE_R2_SECRET_ACCESS_KEY` from `.env`.
+
+## DNS
+
+`statuspage.app.nz` is a proxied Cloudflare A record pointing at:
+
+```text
+93.127.141.100
+```

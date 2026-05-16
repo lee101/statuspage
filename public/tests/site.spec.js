@@ -3,8 +3,8 @@ describe("statuspage.app.nz landing page", function () {
     expect(document.title).toContain("statuspage.app.nz");
     expect(document.querySelector(".brand strong").textContent).toContain("statuspage.app.nz");
     expect(document.body.textContent).toContain("$190/year");
-    expect(document.querySelector("input[name='plan'][value='annual']").checked).toBeTrue();
-    expect(document.querySelector("input[name='plan'][value='monthly']")).not.toBeNull();
+    expect(document.querySelector("#billing-form input[name='plan'][value='annual']").checked).toBeTrue();
+    expect(document.querySelector("#billing-form input[name='plan'][value='monthly']")).not.toBeNull();
   });
 
   it("renders the example status dashboard", function () {
@@ -16,7 +16,9 @@ describe("statuspage.app.nz landing page", function () {
   it("renders login and signup controls", function () {
     expect(document.querySelector("#auth-form")).not.toBeNull();
     expect(document.querySelector("[data-mode='login']")).not.toBeNull();
+    expect(document.querySelector("[data-mode='forgot']")).not.toBeNull();
     expect(document.querySelector("#signup-form")).not.toBeNull();
+    expect(document.querySelector("#billing-dialog")).not.toBeNull();
   });
 
   it("switches the account panel to login mode", function () {

@@ -582,6 +582,31 @@ form {
   padding: 12px;
 }
 
+.billing-dialog {
+  width: min(560px, calc(100vw - 28px));
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.billing-dialog::backdrop {
+  background: rgba(8, 17, 51, .58);
+}
+
+.billing-modal-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding: 20px;
+}
+
+.billing-summary {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .billing-options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -658,24 +683,43 @@ form {
   box-shadow: 0 4px 12px rgba(13, 27, 62, .08);
 }
 
+.unified-signup {
+  align-content: start;
+}
+
+.onboarding-form,
 #auth-form {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 #auth-form button {
   align-self: end;
 }
 
-#auth-message {
+#auth-message,
+#reset-message {
   grid-column: 1 / -1;
   min-height: 24px;
   margin: 0;
   color: var(--muted);
 }
 
+.onboarding-form .tabs,
+.onboarding-form .domain-field,
+.onboarding-form .company-field,
+.onboarding-form button,
+.onboarding-form #auth-message,
+.onboarding-form #reset-message {
+  grid-column: 1 / -1;
+}
+
 .account-state {
   display: grid;
   gap: 8px;
+}
+
+.account-state button {
+  width: max-content;
 }
 
 .account-state span {

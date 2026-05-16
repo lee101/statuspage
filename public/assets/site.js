@@ -1,9 +1,16 @@
 const form = document.querySelector("#signup-form");
 const message = document.querySelector("#form-message");
+const billingDialog = document.querySelector("#billing-dialog");
+const billingForm = document.querySelector("#billing-form");
+const openBillingButton = document.querySelector("#open-billing-button");
 const authForm = document.querySelector("#auth-form");
 const authMessage = document.querySelector("#auth-message");
+const resetForm = document.querySelector("#reset-form");
+const resetMessage = document.querySelector("#reset-message");
 const tabs = document.querySelectorAll(".tab");
 const companyField = document.querySelector(".company-field");
+const passwordField = document.querySelector(".password-field");
+const domainField = document.querySelector(".domain-field");
 const accountState = document.querySelector(".account-state");
 const accountName = document.querySelector("#account-name");
 const accountEmail = document.querySelector("#account-email");
@@ -21,9 +28,13 @@ const checkoutContainer = document.querySelector("#checkout-container");
 let authMode = "register";
 let currentUser = null;
 let stripePublishableKey = "";
+let appNZLoginURL = "";
 let embeddedCheckout = null;
+const params = new URLSearchParams(window.location.search);
+const resetToken = params.get("reset_token");
+const resetEmail = params.get("email") || "";
 
-const checkoutState = new URLSearchParams(window.location.search).get("checkout");
+const checkoutState = params.get("checkout");
 if (checkoutState === "success") {
   messageForPage("Payment received. We will email you with setup next steps.");
 }
@@ -41,19 +52,48 @@ function messageForPage(text) {
 
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  message.textContent = "Creating checkout...";
-  const data = Object.fromEntries(new FormData(form).entries());
-  if (currentUser) {
-    data.email ||= currentUser.email;
-    data.company ||= currentUser.company;
-  }
+  showBillingDialog();
+});
 
+openBillingButton?.addEventListener("click", showBillingDialog);
+
+billingForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (message) message.textContent = "Creating checkout...";
+  const data = checkoutData();
+  const selected = new FormData(billingForm).get("plan");
+  data.plan = selected || data.plan || "annual";
   try {
     await openEmbeddedCheckout(data);
   } catch (err) {
-    message.textContent = err.message;
+    if (message) message.textContent = err.message;
   }
 });
+
+function showBillingDialog() {
+  if (!currentUser && authForm) {
+    authMessage.textContent = "Create an account or login first.";
+    authForm.scrollIntoView({ block: "center" });
+    return;
+  }
+  if (billingDialog) {
+    billingDialog.showModal();
+    return;
+  }
+  openEmbeddedCheckout(checkoutData()).catch((err) => {
+    if (message) message.textContent = err.message;
+  });
+}
+
+function checkoutData() {
+  const data = form ? Object.fromEntries(new FormData(form).entries()) : {};
+  const authData = authForm ? Object.fromEntries(new FormData(authForm).entries()) : {};
+  data.email ||= currentUser?.email || authData.email || "";
+  data.company ||= currentUser?.company || authData.company || companyFromEmail(data.email);
+  data.domain ||= authData.domain || "";
+  data.plan ||= "annual";
+  return data;
+}
 
 async function openEmbeddedCheckout(data) {
   if (!stripePublishableKey) await loadConfig();
@@ -89,7 +129,7 @@ async function openEmbeddedCheckout(data) {
     clientSecret: body.client_secret,
   });
   embeddedCheckout.mount("#checkout-container");
-  message.textContent = "Checkout opened.";
+  if (message) message.textContent = "Checkout opened.";
 }
 
 checkoutDialog?.addEventListener("close", () => {
@@ -104,15 +144,28 @@ tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     authMode = tab.dataset.mode;
     tabs.forEach((item) => item.classList.toggle("active", item === tab));
-    companyField.hidden = authMode === "login";
-    companyField.querySelector("input").required = authMode === "register";
-    authForm.querySelector("button[type='submit']").textContent = authMode === "login" ? "Login" : "Create account";
+    const isLogin = authMode === "login";
+    const isForgot = authMode === "forgot";
+    if (companyField) {
+      companyField.hidden = isLogin || isForgot;
+      companyField.querySelector("input").required = authMode === "register";
+    }
+    if (domainField) domainField.hidden = isLogin || isForgot;
+    if (passwordField) {
+      passwordField.hidden = isForgot;
+      passwordField.querySelector("input").required = !isForgot;
+    }
+    authForm.querySelector("button[type='submit']").textContent = isForgot ? "Send reset link" : isLogin ? "Login" : "Create account and continue";
     authMessage.textContent = "";
   });
 });
 
 authForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (authMode === "forgot") {
+    await requestPasswordReset();
+    return;
+  }
   authMessage.textContent = authMode === "login" ? "Logging in..." : "Creating account...";
   const data = Object.fromEntries(new FormData(authForm).entries());
   const endpoint = authMode === "login" ? "/api/login" : "/api/register";
@@ -130,10 +183,53 @@ authForm?.addEventListener("submit", async (event) => {
     if (form) {
       form.email.value = body.user.email;
       form.company.value = body.user.company;
+      if (form.domain && data.domain) form.domain.value = data.domain;
     }
     loadStatusPages();
+    if (data.domain || document.body.classList.contains("account-page") === false) {
+      showBillingDialog();
+    }
   } catch (err) {
     authMessage.textContent = err.message;
+  }
+});
+
+async function requestPasswordReset() {
+  authMessage.textContent = "Sending reset link...";
+  const data = Object.fromEntries(new FormData(authForm).entries());
+  try {
+    const res = await fetch("/api/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: data.email }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error || "Could not send reset link");
+    authMessage.textContent = "If that app.nz account exists, a reset link has been emailed.";
+  } catch (err) {
+    authMessage.textContent = err.message;
+  }
+}
+
+resetForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  resetMessage.textContent = "Resetting password...";
+  const data = Object.fromEntries(new FormData(resetForm).entries());
+  data.token = resetToken;
+  try {
+    const res = await fetch("/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error || "Reset failed");
+    setUser(body.user);
+    localStorage.setItem("statuspageHasSession", "true");
+    resetMessage.textContent = "Password reset. You are signed in.";
+    loadStatusPages();
+  } catch (err) {
+    resetMessage.textContent = err.message;
   }
 });
 
@@ -153,7 +249,6 @@ newsletterForm?.addEventListener("submit", (event) => {
 });
 
 async function loadCurrentUser() {
-  if (localStorage.getItem("statuspageHasSession") !== "true") return;
   try {
     const res = await fetch("/api/me");
     if (!res.ok) {
@@ -191,6 +286,7 @@ async function loadConfig() {
     if (!res.ok) return;
     const body = await res.json();
     stripePublishableKey = body.stripe_publishable_key || "";
+    appNZLoginURL = body.appnz_login_url || "";
   } catch {}
 }
 
@@ -256,4 +352,13 @@ async function loadDomains(slug) {
 }
 
 loadConfig();
+if (resetToken && resetForm && authForm) {
+  resetForm.hidden = false;
+  authForm.hidden = true;
+  if (resetForm.email) resetForm.email.value = resetEmail;
+}
 loadCurrentUser();
+
+function companyFromEmail(email) {
+  return String(email || "").split("@")[0].replace(/[._-]+/g, " ") || "app.nz user";
+}

@@ -142,45 +142,59 @@
       <section class="signup" id="signup">
         <div>
           <h2>Start your status page</h2>
-          <p>Create an account, then continue to Stripe when you are ready. We will help you configure monitors, branding, alerts, and your customer directory listing.</p>
+          <p>Use one app.nz account for the Applied AI NZ network. Create your account or sign in, add the status page details once, then choose annual or monthly billing in checkout.</p>
         </div>
-        <div class="account-panel" id="account-panel">
+        <div class="account-panel unified-signup" id="account-panel">
           <div class="tabs" aria-label="Account">
             <button type="button" class="tab active" data-mode="register">Create account</button>
             <button type="button" class="tab" data-mode="login">Login</button>
+            <button type="button" class="tab" data-mode="forgot">Forgot password</button>
           </div>
-          <form id="auth-form">
+          <form id="auth-form" class="onboarding-form">
             <label>Email<input name="email" type="email" placeholder="you@company.co.nz" required></label>
+            <label class="password-field">Password<input name="password" type="password" placeholder="At least 6 characters" minlength="6" required></label>
             <label class="company-field">Business name<input name="company" placeholder="My Company" required></label>
-            <label>Password<input name="password" type="password" placeholder="At least 8 characters" minlength="8" required></label>
-            <button type="submit">Create account</button>
+            <label class="domain-field">Domain<input name="domain" placeholder="company.co.nz"></label>
+            <button type="submit">Create account and continue</button>
             <p id="auth-message" role="status"></p>
           </form>
           <div class="account-state" hidden>
             <strong id="account-name"></strong>
             <span id="account-email"></span>
+            <button type="button" id="open-billing-button">Choose billing</button>
             <button type="button" id="logout-button">Logout</button>
           </div>
         </div>
-        <form id="signup-form">
+        <form id="signup-form" hidden>
+          <input name="email" type="email">
+          <input name="company">
+          <input name="domain">
+          <input name="plan" value="annual">
+        </form>
+      </section>
+
+      <dialog id="billing-dialog" class="billing-dialog">
+        <form method="dialog" class="checkout-dialog-bar">
+          <strong>Choose billing</strong>
+          <button type="submit">Close</button>
+        </form>
+        <form id="billing-form" class="billing-modal-body">
           <fieldset class="billing-options">
             <legend>Billing</legend>
             <label class="billing-option">
               <input type="radio" name="plan" value="annual" checked>
-              <span><strong>Annual</strong><small>$190/year</small></span>
+              <span><strong>Annual</strong><small>$190/year, best value</small></span>
             </label>
             <label class="billing-option">
               <input type="radio" name="plan" value="monthly">
               <span><strong>Monthly</strong><small>$19/month</small></span>
             </label>
           </fieldset>
-          <label>Email<input name="email" type="email" placeholder="you@company.co.nz" required></label>
-          <label>Business name<input name="company" placeholder="My Company" required></label>
-          <label>Domain<input name="domain" placeholder="company.co.nz"></label>
+          <p class="billing-summary">Checkout will use your signed-in app.nz account and status page details.</p>
           <button type="submit">Continue to Stripe</button>
           <p id="form-message" role="status"></p>
         </form>
-      </section>
+      </dialog>
 
       <dialog id="checkout-dialog" class="checkout-dialog">
         <form method="dialog" class="checkout-dialog-bar">

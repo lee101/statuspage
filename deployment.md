@@ -66,6 +66,10 @@ APP_URL=https://statuspage.app.nz
 PORT=8096
 DATABASE_URL=postgres://statuspage:statuspage@localhost:5432/statuspage?sslmode=disable
 SESSION_SECRET=...
+APPNZ_DATABASE_PATH=/nvme0n1-disk/data/appnz-sso.db
+APPNZ_LOGIN_URL=https://app.nz/login
+APPNZ_COOKIE_DOMAIN=.app.nz
+APPNZ_SECURE_COOKIES=true
 STRIPE_SECRET_KEY=...
 STRIPE_PUBLISHABLE_KEY=...
 STRIPE_MONTHLY_PRICE_ID=price_1TX9jlHMzkYZId23ciQyuQXf
@@ -80,6 +84,8 @@ SES_FROM_EMAIL=...
 ```
 
 Annual checkout is the default plan. Monthly checkout uses the monthly Stripe price ID above.
+
+The app.nz shared login uses the `appnz_session` cookie on `.app.nz` and validates it against the app.nz SSO SQLite database. statuspage.app.nz maps a valid app.nz account into its local Postgres `users` table by email so status pages can keep using the existing ownership model.
 
 ## What `deploy.sh` does
 

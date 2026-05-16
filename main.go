@@ -23,6 +23,7 @@ var publicFS embed.FS
 type App struct {
 	baseURL        string
 	db             *sql.DB
+	appAuth        *appNZAuth
 	sessionSecret  []byte
 	dns            dnsProvisioner
 	stripe         *StripeService
@@ -52,6 +53,7 @@ func main() {
 	app := &App{
 		baseURL:       getenv("APP_URL", "http://localhost:"+getenv("PORT", "8080")),
 		db:            db,
+		appAuth:       newAppNZAuthFromEnv(),
 		sessionSecret: []byte(getenv("SESSION_SECRET", "dev-session-secret-change-me")),
 		dns:           newDNSProvisionerFromEnv(),
 		stripe:        NewStripeService(os.Getenv("STRIPE_SECRET_KEY")),
@@ -101,6 +103,10 @@ func (a *App) handle(ctx *fasthttp.RequestCtx) {
 		a.handleRegister(ctx)
 	case p == "/api/login":
 		a.handleLogin(ctx)
+	case p == "/api/forgot-password":
+		a.handleForgotPassword(ctx)
+	case p == "/api/reset-password":
+		a.handleResetPassword(ctx)
 	case p == "/api/logout":
 		a.handleLogout(ctx)
 	case p == "/api/me":
@@ -116,7 +122,11 @@ func (a *App) handle(ctx *fasthttp.RequestCtx) {
 	case p == "/checkout/create-embedded":
 		a.handleCreateEmbeddedCheckout(ctx)
 	case p == "/api/config":
-		writeJSON(ctx, fasthttp.StatusOK, map[string]any{"stripe_publishable_key": a.publishableKey})
+		writeJSON(ctx, fasthttp.StatusOK, map[string]any{
+			"stripe_publishable_key": a.publishableKey,
+			"appnz_login_url":        a.appNZLoginURL(),
+			"shared_login_enabled":   a.appAuth != nil,
+		})
 	case p == "/stripe/webhook":
 		a.handleStripeWebhook(ctx)
 	case strings.HasPrefix(p, "/assets/"):

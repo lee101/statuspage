@@ -3,7 +3,8 @@ import path from "node:path";
 
 const root = process.cwd();
 const sourceDir = path.join(root, "public");
-const outDir = path.join(root, "dist", "public");
+const outDir = process.env.OUT_DIR ? path.resolve(root, process.env.OUT_DIR) : path.join(root, "dist", "public");
+const publicBasePath = normalizeBasePath(process.env.PUBLIC_BASE_PATH || "");
 
 await rm(outDir, { recursive: true, force: true });
 await copyOptimized(sourceDir, outDir);
@@ -25,7 +26,7 @@ async function copyOptimized(src, dest) {
     const input = await readFile(srcPath, ext === ".svg" || isText(ext) ? "utf8" : undefined);
     let output = input;
 
-    if (ext === ".html") output = minifyHtml(input);
+    if (ext === ".html") output = rewritePublicBase(minifyHtml(input));
     if (ext === ".css") output = minifyCss(input);
     if (ext === ".svg") output = minifySvg(input);
     if (ext === ".js" && !rel.startsWith(`assets${path.sep}jasmine${path.sep}`)) {
@@ -34,6 +35,19 @@ async function copyOptimized(src, dest) {
 
     await writeFile(destPath, output);
   }
+}
+
+function normalizeBasePath(value) {
+  if (!value || value === "/") return "";
+  return `/${value.replace(/^\/+|\/+$/g, "")}`;
+}
+
+function rewritePublicBase(value) {
+  if (!publicBasePath) return value;
+  return value
+    .replaceAll('href="/', `href="${publicBasePath}/`)
+    .replaceAll('src="/', `src="${publicBasePath}/`)
+    .replaceAll('content="/', `content="${publicBasePath}/`);
 }
 
 function isText(ext) {

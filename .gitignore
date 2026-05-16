@@ -1,3 +1,4 @@
 .env
 .env.example
 test-results/
+dist/appstatic/

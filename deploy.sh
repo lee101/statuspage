@@ -11,6 +11,11 @@ R2_BUCKET="${R2_BUCKET:-appstatic}"
 R2_PREFIX="${R2_PREFIX:-statuspage}"
 PUBLIC_BASE_PATH="${PUBLIC_BASE_PATH:-/$R2_PREFIX}"
 BUILD_OUT_DIR="${BUILD_OUT_DIR:-dist/appstatic}"
+STATUSPAGE_BINARY_WAS_DIRTY=0
+
+if [[ -d ".git" ]] && ! git diff --quiet -- statuspage 2>/dev/null; then
+  STATUSPAGE_BINARY_WAS_DIRTY=1
+fi
 
 if [[ -f ".env" ]]; then
   set -a
@@ -43,6 +48,10 @@ echo "Step 1: Building production app"
 echo
 echo "Step 2: Running Go tests"
 go test ./...
+
+if [[ -d ".git" && "$STATUSPAGE_BINARY_WAS_DIRTY" -eq 0 ]] && ! git diff --quiet -- statuspage 2>/dev/null; then
+  git restore -- statuspage
+fi
 
 echo
 echo "Step 3: Building static bucket output"

@@ -396,7 +396,7 @@ footer {
 
 .logo-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
   margin-top: 28px;
 }
@@ -420,6 +420,18 @@ footer {
 .logo-grid img {
   width: 44px;
   height: 44px;
+}
+
+.product-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
 }
 
 .logo-grid small {

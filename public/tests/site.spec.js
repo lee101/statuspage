@@ -13,6 +13,17 @@ describe("statuspage.app.nz landing page", function () {
     expect(document.querySelectorAll(".monitor-table .row").length).toBeGreaterThan(3);
   });
 
+  it("renders real Applied AI product links", function () {
+    var customers = document.querySelector("#customers");
+    expect(customers).not.toBeNull();
+    expect(customers.textContent).toContain("Applied AI products");
+    expect(customers.textContent).toContain("text-generator.io");
+    expect(customers.textContent).toContain("netwrck.com");
+    expect(customers.textContent).toContain("simplexgen.com");
+    expect(customers.textContent).not.toContain("devmate.co.nz");
+    expect(customers.textContent).not.toContain("Add your business");
+  });
+
   it("renders login and signup controls", function () {
     expect(document.querySelector("#auth-form")).not.toBeNull();
     expect(document.querySelector("[data-mode='login']")).not.toBeNull();

@@ -46,8 +46,9 @@ echo
 echo "Step 1: Building production app"
 "$BUN_BIN" run build
 mkdir -p "$(dirname "$DEPLOY_BINARY")"
-cp statuspage "$DEPLOY_BINARY"
-chmod +x "$DEPLOY_BINARY"
+cp statuspage "${DEPLOY_BINARY}.new"
+chmod +x "${DEPLOY_BINARY}.new"
+mv "${DEPLOY_BINARY}.new" "$DEPLOY_BINARY"
 
 echo
 echo "Step 2: Running Go tests"

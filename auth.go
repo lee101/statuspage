@@ -76,7 +76,7 @@ func (a *App) handleRegister(ctx *fasthttp.RequestCtx) {
 		}
 		a.setSessionCookie(ctx, user.ID)
 		a.appAuth.setSessionCookie(ctx, token)
-		go sendWelcomeEmail(user.Email, user.Company)
+		go sendWelcomeEmailOnce(a.db, user.Email, user.Company)
 		writeJSON(ctx, fasthttp.StatusOK, map[string]any{"user": user, "shared": true})
 		return
 	}
@@ -107,7 +107,7 @@ func (a *App) handleRegister(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	a.setSessionCookie(ctx, user.ID)
-	go sendWelcomeEmail(user.Email, user.Company)
+	go sendWelcomeEmailOnce(a.db, user.Email, user.Company)
 	writeJSON(ctx, fasthttp.StatusOK, map[string]any{"user": user})
 }
 

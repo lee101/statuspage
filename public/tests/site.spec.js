@@ -27,6 +27,17 @@ describe("statuspage.app.nz landing page", function () {
     expect(document.querySelector("#auth-form button").textContent).toContain("Login");
   });
 
+  it("opens billing from the signed-in account state", function () {
+    document.querySelector(".account-state").hidden = false;
+    document.querySelector("#auth-form").hidden = true;
+    document.querySelector("#account-name").textContent = "Test Co";
+    document.querySelector("#account-email").textContent = "test@example.com";
+    document.querySelector("#open-billing-button").click();
+    expect(document.querySelector("#billing-dialog").open).toBeTrue();
+    document.querySelector("#billing-dialog").close();
+    expect(document.querySelector("#logout-button")).toBeNull();
+  });
+
   it("has a full footer with product and company links", function () {
     var footer = document.querySelector(".site-footer");
     expect(footer).not.toBeNull();

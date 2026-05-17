@@ -71,16 +71,18 @@ billingForm?.addEventListener("submit", async (event) => {
 });
 
 function showBillingDialog() {
-  if (!currentUser && authForm) {
+  const data = checkoutData();
+  if (!currentUser && !data.email && authForm) {
     authMessage.textContent = "Create an account or login first.";
     authForm.scrollIntoView({ block: "center" });
     return;
   }
   if (billingDialog) {
+    if (message) message.textContent = "";
     billingDialog.showModal();
     return;
   }
-  openEmbeddedCheckout(checkoutData()).catch((err) => {
+  openEmbeddedCheckout(data).catch((err) => {
     if (message) message.textContent = err.message;
   });
 }
@@ -88,8 +90,8 @@ function showBillingDialog() {
 function checkoutData() {
   const data = form ? Object.fromEntries(new FormData(form).entries()) : {};
   const authData = authForm ? Object.fromEntries(new FormData(authForm).entries()) : {};
-  data.email ||= currentUser?.email || authData.email || "";
-  data.company ||= currentUser?.company || authData.company || companyFromEmail(data.email);
+  data.email ||= currentUser?.email || authData.email || accountEmail?.textContent || "";
+  data.company ||= currentUser?.company || authData.company || accountName?.textContent || companyFromEmail(data.email);
   data.domain ||= authData.domain || "";
   data.plan ||= "annual";
   return data;

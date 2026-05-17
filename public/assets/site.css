@@ -722,6 +722,14 @@ form {
   width: max-content;
 }
 
+.account-link {
+  width: max-content;
+  color: var(--green-dark);
+  font-size: 14px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
 .account-state span {
   color: var(--muted);
 }
